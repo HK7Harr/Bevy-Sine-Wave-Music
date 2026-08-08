@@ -32,6 +32,6 @@ pub fn add(
     commands.spawn((
         Mesh2d(meshes.add(Circle::new(30.0))),
         MeshMaterial2d(materials.add(Color::srgb(0.0, 0.5, 0.5))),
-        Transform::from_xyz(0.0, 0.0, 0.0)
+        Transform::from_xyz(0.0, 600.0, 0.0)
     ));
 }

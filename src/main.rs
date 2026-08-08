@@ -12,9 +12,8 @@ use ecs_init::*;
 
 pub const BODY_FONT_SIZE: f32 = 20.0;
 pub const HEADER_FONT_SIZE: f32 = 32.0;
-    
-pub const MIN_PANEL_WIDTH: f32 = 350.0;
-pub const MAX_PANEL_WIDTH: f32 = 700.0;
+pub const SLIDER_WIDTH: f32 = 400.0;
+
 
 fn main() {
     App::new()

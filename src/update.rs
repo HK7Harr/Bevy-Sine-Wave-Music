@@ -1,12 +1,5 @@
 use crate::internal_imports::*;
 
-use bevy::prelude::*;
-use bevy_egui::{egui, EguiContexts};
-
-// Assuming you have these constants defined somewhere
-const BODY_FONT_SIZE: f32 = 14.0;
-const HEADER_FONT_SIZE: f32 = 20.0;
-const SLIDER_WIDTH: f32 = 200.0;
 
 // Dummy struct based on your snippet
 #[derive(Resource)]
@@ -43,8 +36,8 @@ pub fn draw_panel(
 
     // UI 
     let left_logical_width = egui::panel::Panel::left("left_panel") // Note: Standard egui uses SidePanel
-        .resizable(true)
-        .size_range(MIN_PANEL_WIDTH..=MAX_PANEL_WIDTH)
+        .resizable(false)
+        .min_size(400.0)
         .show(&mut viewport_ui, |ui| {
             ui.heading("Sim Info");
 
