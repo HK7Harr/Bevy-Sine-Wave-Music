@@ -1,3 +1,27 @@
+mod internal_imports;
+use internal_imports::*;
+
+mod startup;
+use startup::*;
+
+mod update;
+use update::*;
+
+mod ecs_init;
+use ecs_init::*;
+
+pub const BODY_FONT_SIZE: f32 = 20.0;
+pub const HEADER_FONT_SIZE: f32 = 32.0;
+    
+pub const MIN_PANEL_WIDTH: f32 = 350.0;
+pub const MAX_PANEL_WIDTH: f32 = 700.0;
+
 fn main() {
-    println!("Hello, world!");
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_plugins(EguiPlugin::default())
+
+        .add_systems(Startup, (add, setup_cameras))
+        .add_systems(EguiPrimaryContextPass, draw_panel)
+        .run();
 }
