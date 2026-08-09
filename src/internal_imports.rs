@@ -6,4 +6,5 @@ pub use h_math::prelude::*;
 pub use bevy::math::*;
 pub use rand::prelude::*;
 pub use bevy_egui::{*, egui::{LayerId, Ui, UiBuilder}};
+pub use bevy::color::palettes::css::*;
 pub use crate::{*}; 

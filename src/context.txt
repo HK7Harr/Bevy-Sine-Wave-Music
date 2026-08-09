@@ -1,0 +1,96 @@
+If you're using Bevy's default 2D camera, with no zoom or camera movement, and your window is exactly 2560 × 1440 (1440p), then the center is (0, 0) and the eight relevant points around the screen are:
+
+(-1280,  720) ─────────────── (0, 720) ─────────────── (1280, 720)
+     │                                                   │
+     │                                                   │
+     │                                                   │
+(-1280,    0) ─────────────── (0, 0) ───────────────── (1280, 0)
+     │                                                   │
+     │                                                   │
+     │                                                   │
+(-1280, -720) ─────────────── (0,-720) ─────────────── (1280,-720)
+
+So the four corners are:
+
+Top-left:     (-1280,  720)
+Top-right:    ( 1280,  720)
+Bottom-left:  (-1280, -720)
+Bottom-right: ( 1280, -720)
+
+And the four edge midpoints are:
+
+Top:          (0,  720)
+Right:        (1280, 0)
+Bottom:       (0, -720)
+Left:         (-1280, 0)
+
+So your visible range is:
+
+x: -1280 → 1280
+y:  -720 → 720
+
+One important Bevy detail: this assumes your actual game window is 2560×1440 and your orthographic camera has its default scale. If you're running the game fullscreen, the actual window resolution is what you should use rather than necessarily assuming 2560×1440.
+
+can i see where the camera is or the viewport
+
+Yes. If you mean visually in your Bevy game, there are a few useful ways.
+
+1. Draw the camera viewport as a rectangle
+
+For your sine-wave editor, this is probably the most useful. You can draw a rectangle around the camera's visible area so you can see exactly what coordinates are currently on screen.
+
+With a camera centered at (camera_x, camera_y) and visible width/height:
+
+left   = camera_x - width / 2
+right  = camera_x + width / 2
+
+bottom = camera_y - height / 2
+top    = camera_y + height / 2
+
+Then draw a rectangle using those four coordinates.
+
+For example, at 2560×1440 with the default camera:
+
+(-1280, 720) ┌──────────────────────┐ (1280, 720)
+             │                      │
+             │       CAMERA         │
+             │                      │
+(-1280,-720) └──────────────────────┘ (1280,-720)
+
+When you pan, the rectangle moves with the camera.
+
+2. Print the camera position
+
+If you just want to debug where the camera is:
+
+fn debug_camera(
+    query: Query<&Transform, With<Camera2d>>,
+) {
+    for transform in query.iter() {
+        println!("Camera: {:?}", transform.translation);
+    }
+}
+
+Then you'll see something like:
+
+Camera: Vec3(500.0, 200.0, 0.0)
+
+That tells you the center of the viewport.
+
+3. Get the actual viewport size
+
+If you're using an orthographic camera, you can also inspect its projection. This becomes particularly important once you add zooming, because the relationship between screen pixels and world coordinates changes.
+
+For your project, I'd recommend having a small debug overlay that displays something like:
+
+Camera:
+  Position: (500, 200)
+  Zoom: 1.0
+
+Viewport:
+  Left:   -780
+  Right:   1780
+  Bottom: -520
+  Top:     920
+
+That would make implementing your pan limits much easier because you can immediately see whether the camera is trying to move beyond your sine-wave workspace.
