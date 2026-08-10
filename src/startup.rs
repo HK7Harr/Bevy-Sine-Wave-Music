@@ -1,6 +1,3 @@
-use bevy::camera::visibility::RenderLayers;
-use bevy::ecs::schedule;
-
 use crate::ecs_init::*;
 
 use crate::internal_imports::*;
@@ -32,18 +29,7 @@ pub fn setup_cameras(
     ));
 }
 
-pub fn add(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-) {
-    commands.spawn((
-        Mesh2d(meshes.add(Circle::new(30.0))),
-        MeshMaterial2d(materials.add(Color::srgb(0.0, 0.5, 0.5))),
-        Transform::from_xyz(0.0, 600.0, 0.0)
-    ));
-}
 
 pub fn setup_schedules(mut s: ResMut<Scheduler>) {
-    s.add("ui_multiplier", 60);
+    s.add("ui_multiplier", 120);
 }

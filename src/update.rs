@@ -6,7 +6,8 @@ pub fn draw_panel(
     mut contexts: EguiContexts,    
     mut info: ResMut<PanelInfo>,
     scheduler: Res<Scheduler>,
-    window: Single<&Window, With<PrimaryWindow>>,    
+    window: Single<&Window, With<PrimaryWindow>>,  
+    mut camera_query: Query<&mut Camera, With<MainCamera>>,   
 ) {
     if window.physical_width() == 0 || window.physical_height() == 0 {
         return;
@@ -51,14 +52,7 @@ pub fn draw_panel(
         .width(); 
 
     info.width = left_logical_width;
-}
 
-
-pub fn update_game_viewport(
-    window: Single<&Window, With<PrimaryWindow>>,      
-    mut camera_query: Query<&mut Camera, With<MainCamera>>,   
-    info: Res<PanelInfo>
-) {
     // converting from egui logical units to viewport 
     let scale_factor = window.scale_factor();
     let left_physical_width = (info.width * scale_factor) as u32;
@@ -86,21 +80,77 @@ pub fn update_game_viewport(
         }
     }
 }
+pub fn draw_collective_music_gizmos(
+    mut gizmos: Gizmos,
+    waves: Res<CompositionWaves>,
+    camera_query: Query<(&Transform, &Projection), With<MainCamera>>,
+) {
+    let Ok((cam_transform, projection)) = camera_query.single() else { return; };
 
+    // Extract the inner OrthographicProjection struct from the Projection enum component
+    if let Projection::Orthographic(ortho) = projection {
+        // Calculate the top y of the viewport in world space
+        let viewport_top_y = cam_transform.translation.y + (ortho.area.height() / 2.0);
+        let header_y = viewport_top_y - 360.0;
 
+        // draw red header
+        gizmos.line_2d(
+            Vec2::new(-1280.0, header_y),
+            Vec2::new(15000.0, header_y),
+            RED,
+        );
+    }
+}   
 
-pub fn draw_gizmos(
+pub fn draw_composing_music_gizmos(
     mut gizmos: Gizmos,
     waves: Res<CompositionWaves>
 ) {
-    let downward_length: f32 = waves.waves.len() as f32 * 400.0;
+    let separators: u32 = waves.waves.len() as u32 + 1;
 
-    // marglinje
-    gizmos.line_2d(
-        Vec2 { x: 100.0, y: 720.0 },
-        Vec2 { x: 100.0, y: 720.0 - downward_length },
-        CRIMSON
-    );
+    // separator linws
+    for i in 1..=separators {
+        match i {
+            1 => {}
+            2 => {
+                gizmos.line_2d(
+                Vec2 { x: -1280.0, y:  0.0}, 
+                Vec2 { x: 15000.0, y: 0.0 }, 
+                DARK_GREEN
+                );
+            }
+            _ => {
+                gizmos.line_2d(
+                Vec2 { x: -1280.0, y: (i as f32 - 2.0)* -360.0}, 
+                Vec2 { x: 15000.0, y: (i as f32 - 2.0)* -360.0}, 
+                DARK_GREEN
+                );
+            }
+        }
+    }
+
+}
+
+pub fn draw_sine_gizmo(gizmos: &mut Gizmos, sine: &SineWave, index: u32) {
+    let segments = (sine.x_stop - sine.x_start / PIXEL_PER_SEGMENT).floor() as i32;
+    let total_time = sine.x_stop - sine.x_start / PIXELS_TO_SECONDS_RATIO;
+    let total_music_units = sine.x_stop - sine.x_start / PIXELS_TO_MUSIC_RATIO;
+    
+    let time_units_segment_size = total_time / segments as f64;
+    let music_units_segment_size = total_music_units / segments as f64;
+
+    let mut points_with_color: Vec<(Vec2, Srgba)> = Vec::new();
+
+    for i in 1..segments {
+        let xmu = i as f64 * music_units_segment_size;
+        let y = ((xmu * sine.phase_offset).sin() * sine.amplitude * 160.0 + 180.0) - (index * 360) as f64;
+        let x = i as f64 * PIXEL_PER_SEGMENT;
+
+        let position = Vec2 {x: x as f32, y: y as f32};
+        let color: Srgba;
+        if i as f64 * time_units_segment_size <= sine.attack {color = RED}
+        else if i as f64 * time_units_segment_size <= sine.attack + sine.decay {}
+    }
 }
 
 pub fn scheduler_add_frame(mut scheduler: ResMut<Scheduler>) {

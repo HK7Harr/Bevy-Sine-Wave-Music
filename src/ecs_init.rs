@@ -10,21 +10,35 @@ pub struct UICamera;
 
 #[derive(Component)]
 pub struct SineWave {
-    // math terms
-    pub amplitude: f64, // maximum value of the sine function
-    pub frequency: f64, // length from a to b where a and b are two top's next to each other
-    pub phase: f64, // where the wave starts
+    // Math 
+    pub frequency: f64,     // Hz
+    pub period: f64,        // peak to peak
+    pub amplitude: f64,     // Peak volume 0-1
+    pub phase_offset: f64,  // Initial phase shift in radians (0.0 to 2π)
+    pub detune_cents: f64,  // Fine tuning in cents -100-100
 
-    // music terms
-    pub attack: f64, // how many cycles it takes to go to maximum
-    pub sustain: f64, // how many cycles it stays at peak amplitude
-    pub release: f64, // how many cycles it takes to drop to minimum
+    // envelope adsr in seconds
+    pub attack: f64,        // Time to reach peak amplitude
+    pub decay: f64,         // Time to fall from peak to sustain level
+    pub sustain_level: f64, // Amplitude multiplier during sustain 0-1
+    pub release: f64,       // Time to fade to 0 after key release 
 
-    // location
-    pub x_min: f64,
-    pub x_max: f64,
+    // Audio Output & State
+    pub pan: f32,           // Stereo pan: -1.0 (Left) to 1.0 (Right)
+    pub current_phase: f64, // Tracks current wave position to prevent audio clicks
+    pub is_active: bool,     // Whether the wave is currently generating sound
+
+    // x bounds
+    pub x_start: f64,
+    pub x_stop: f64,
 }
 
+#[derive(Resource)]
+pub struct AudioSettings {
+    pub time_multiplier: f32,
+    pub is_playing: (bool, usize), //if it is playing and what is playing, 0 is collective, the indecies up from that is the track playing 
+    pub repeat: bool,
+}
 
 #[derive(Default, Resource)]
 pub struct CompositionWaves {
